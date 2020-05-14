@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Variation;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BaseController as BaseController;
+use App\Http\Resources\Variation as VariationResource;
+use Validator;
 
-class VariationController extends Controller
+class VariationController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -13,7 +17,9 @@ class VariationController extends Controller
      */
     public function index()
     {
-        //
+        $variations = Variation::all();
+
+        return $this->sendResponse(VariationResource::collection($variations), 'Variations retrieved successfully.');
     }
 
     /**
@@ -34,7 +40,19 @@ class VariationController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $input = $request->all();
+
+        $validator = Validator::make($input, [
+            'name' => 'required|unique:variations'
+        ]);
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        $variation = new Variation();
+        if($this->insert_or_update($request, $variation)){
+            return $this->sendResponse(new VariationResource($variation), 'Variation created successfully.');
+        }
     }
 
     /**
@@ -45,7 +63,13 @@ class VariationController extends Controller
      */
     public function show($id)
     {
-        //
+        $variation = Variation::find($id);
+
+        if (is_null($variation)) {
+            return $this->sendError('Variation not found.');
+        }
+
+        return $this->sendResponse(new VariationResource($variation), 'Variation retrieved successfully.');
     }
 
     /**
@@ -66,9 +90,20 @@ class VariationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Variation $variation)
     {
-        //
+        $input = $request->all();
+
+        $validator = Validator::make($input, [
+            'name' => 'required|unique:variations,name,' . $variation->id
+        ]);
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        if($this->insert_or_update($request, $variation)){
+            return $this->sendResponse(new VariationResource($variation), 'Variation updated successfully.');
+        }
     }
 
     /**
@@ -77,8 +112,19 @@ class VariationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Variation $variation)
     {
-        //
+        $variation->delete();
+
+        return $this->sendResponse([], 'Variation deleted successfully.');
     }
+
+    public function insert_or_update($request, $obj){
+        $obj->name = $request->name;
+        if($obj->save()){
+            return true;
+        }
+        return false;
+    }
+
 }

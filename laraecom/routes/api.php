@@ -18,8 +18,13 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
+Route::get('variations', 'VariationController@index');
+Route::get('variations/{variation}', 'VariationController@show');
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::get('logout', 'AuthController@logout');
+    Route::post('variations', 'VariationController@store');
+    Route::put('variations/{variation}', 'VariationController@update');
+    Route::delete('variations/{variation}', 'VariationController@destroy');
 });
 
