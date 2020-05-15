@@ -48,4 +48,13 @@ class BaseController extends Controller
 
         return response()->json($response, $code);
     }
+
+    public function prepareMessage($key, $resource='Resource'){
+        $message['index'] = sprintf("%s retrieved successfully.", $resource);
+        $message['store'] = sprintf("%s created successfully.", $resource);
+        $message['show'] = sprintf("%s retrieved successfully.", $resource);
+        $message['update'] = sprintf("%s updated successfully.", $resource);
+        $message['destroy'] = sprintf("%s deleted successfully.", $resource);
+        return isset($message[$key]) ? $message[$key] : "";
+    }
 }

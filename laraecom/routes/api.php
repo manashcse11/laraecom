@@ -23,8 +23,11 @@ Route::get('variations/{variation}', 'VariationController@show');
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::get('logout', 'AuthController@logout');
+
     Route::post('variations', 'VariationController@store');
     Route::put('variations/{variation}', 'VariationController@update');
     Route::delete('variations/{variation}', 'VariationController@destroy');
+
+    Route::resource('users', 'UserController');
 });
 
