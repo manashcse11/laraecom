@@ -10,6 +10,7 @@ use Validator;
 
 class VariationController extends BaseController
 {
+    public $resource = "Variation";
     /**
      * Display a listing of the resource.
      *
@@ -19,7 +20,7 @@ class VariationController extends BaseController
     {
         $variations = Variation::all();
 
-        return $this->sendResponse(VariationResource::collection($variations), 'Variations retrieved successfully.');
+        return $this->sendResponse(VariationResource::collection($variations), $this->prepareMessage(__FUNCTION__, $this->resource."s"));
     }
 
     /**
@@ -51,7 +52,7 @@ class VariationController extends BaseController
 
         $variation = new Variation();
         if($this->insert_or_update($request, $variation)){
-            return $this->sendResponse(new VariationResource($variation), 'Variation created successfully.');
+            return $this->sendResponse(new VariationResource($variation), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -66,10 +67,10 @@ class VariationController extends BaseController
         $variation = Variation::find($id);
 
         if (is_null($variation)) {
-            return $this->sendError('Variation not found.');
+            return $this->sendError($this->prepareMessage('not_found', $this->resource));
         }
 
-        return $this->sendResponse(new VariationResource($variation), 'Variation retrieved successfully.');
+        return $this->sendResponse(new VariationResource($variation), $this->prepareMessage(__FUNCTION__, $this->resource));
     }
 
     /**
@@ -102,7 +103,7 @@ class VariationController extends BaseController
         }
 
         if($this->insert_or_update($request, $variation)){
-            return $this->sendResponse(new VariationResource($variation), 'Variation updated successfully.');
+            return $this->sendResponse(new VariationResource($variation), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -116,7 +117,7 @@ class VariationController extends BaseController
     {
         $variation->delete();
 
-        return $this->sendResponse([], 'Variation deleted successfully.');
+        return $this->sendResponse([], $this->prepareMessage(__FUNCTION__, $this->resource));
     }
 
     public function insert_or_update($request, $obj){
