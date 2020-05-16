@@ -28,6 +28,9 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::put('variations/{variation}', 'VariationController@update');
     Route::delete('variations/{variation}', 'VariationController@destroy');
 
-    Route::resource('users', 'UserController');
+    Route::get('users', 'UserController@index');
+    Route::get('users/{user}', 'UserController@show');
+    Route::put('users/{user}', 'UserController@update');
+    Route::delete('users/{user}', 'UserController@destroy');
 });
 

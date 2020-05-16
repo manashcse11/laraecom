@@ -55,6 +55,7 @@ class BaseController extends Controller
         $message['show'] = sprintf("%s retrieved successfully.", $resource);
         $message['update'] = sprintf("%s updated successfully.", $resource);
         $message['destroy'] = sprintf("%s deleted successfully.", $resource);
+        $message['not_found'] = sprintf("%s not found.", $resource);
         return isset($message[$key]) ? $message[$key] : "";
     }
 }

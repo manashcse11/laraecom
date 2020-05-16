@@ -24,39 +24,6 @@ class UserController extends BaseController
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $input = $request->all();
-
-        $validator = Validator::make($input, [
-            'name' => 'required|unique:users'
-        ]);
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-
-        $user = new User();
-        if($this->insert_or_update($request, $user)){
-            return $this->sendResponse(new UserResource($user), $this->prepareMessage(__FUNCTION__, $this->resource));
-        }
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  int  $id
@@ -67,7 +34,7 @@ class UserController extends BaseController
         $user = User::find($id);
 
         if (is_null($user)) {
-            return $this->sendError('User not found.');
+            return $this->sendError($this->prepareMessage('not_found', $this->resource));
         }
 
         return $this->sendResponse(new UserResource($user), $this->prepareMessage(__FUNCTION__, $this->resource));
@@ -96,7 +63,8 @@ class UserController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required|unique:variations,name,' . $user->id
+            'name' => 'required',
+            'email' => 'required|unique:users,email,' . $user->id
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
@@ -113,7 +81,7 @@ class UserController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Variation $user)
+    public function destroy(User $user)
     {
         $user->delete();
 
@@ -122,6 +90,7 @@ class UserController extends BaseController
 
     public function insert_or_update($request, $obj){
         $obj->name = $request->name;
+        $obj->email = $request->email;
         if($obj->save()){
             return true;
         }
