@@ -18,7 +18,8 @@ class CategoryController extends BaseController
      */
     public function index()
     {
-        $categories = Category::all();
+        $cat = new Category();
+        $categories = $cat->getCategoriesWithNestedChild();
 
         return $this->sendResponse(CategoryResource::collection($categories), $this->prepareMessage(__FUNCTION__, $this->resource));
     }
