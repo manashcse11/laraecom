@@ -20,6 +20,8 @@ Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 Route::get('variations', 'VariationController@index');
 Route::get('variations/{variation}', 'VariationController@show');
+Route::get('categories', 'CategoryController@index');
+Route::get('categories/{category}', 'CategoryController@show');
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::get('logout', 'AuthController@logout');
@@ -32,5 +34,9 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::get('users/{user}', 'UserController@show');
     Route::put('users/{user}', 'UserController@update');
     Route::delete('users/{user}', 'UserController@destroy');
+
+    Route::post('categories', 'CategoryController@store');
+    Route::put('categories/{category}', 'CategoryController@update');
+    Route::delete('categories/{category}', 'CategoryController@destroy');
 });
 
