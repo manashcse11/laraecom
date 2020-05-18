@@ -18,7 +18,7 @@ class CreateProductVariationsTable extends Migration
             $table->integer('product_id');
             $table->integer('variation_id');
             $table->string('variation_value');
-            $table->float('base_price')->default(0);
+            $table->integer('in_stock');
             $table->timestamps();
         });
     }
