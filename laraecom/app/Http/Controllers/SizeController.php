@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Variation;
+use App\Size;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController as BaseController;
-use App\Http\Resources\Variation as VariationResource;
+use App\Http\Resources\Size as SizeResource;
 use Validator;
 
-class VariationController extends BaseController
+class SizeController extends BaseController
 {
-    public $resource = "Variation";
+    public $resource = "Size";
     /**
      * Display a listing of the resource.
      *
@@ -18,9 +18,9 @@ class VariationController extends BaseController
      */
     public function index()
     {
-        $variations = Variation::all();
+        $sizes = Size::all();
 
-        return $this->sendResponse(VariationResource::collection($variations), $this->prepareMessage(__FUNCTION__, $this->resource."s"));
+        return $this->sendResponse(SizeResource::collection($sizes), $this->prepareMessage(__FUNCTION__, $this->resource."s"));
     }
 
     /**
@@ -44,15 +44,15 @@ class VariationController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required|unique:variations'
+            'name' => 'required|unique:sizes'
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $variation = new Variation();
-        if($this->insert_or_update($request, $variation)){
-            return $this->sendResponse(new VariationResource($variation), $this->prepareMessage(__FUNCTION__, $this->resource));
+        $size = new Size();
+        if($this->insert_or_update($request, $size)){
+            return $this->sendResponse(new SizeResource($size), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -64,13 +64,13 @@ class VariationController extends BaseController
      */
     public function show($id)
     {
-        $variation = Variation::find($id);
+        $size = Size::find($id);
 
-        if (is_null($variation)) {
+        if (is_null($size)) {
             return $this->sendError($this->prepareMessage('not_found', $this->resource));
         }
 
-        return $this->sendResponse(new VariationResource($variation), $this->prepareMessage(__FUNCTION__, $this->resource));
+        return $this->sendResponse(new SizeResource($size), $this->prepareMessage(__FUNCTION__, $this->resource));
     }
 
     /**
@@ -91,19 +91,19 @@ class VariationController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Variation $variation)
+    public function update(Request $request, Size $size)
     {
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required|unique:variations,name,' . $variation->id
+            'name' => 'required|unique:sizes,name,' . $size->id
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if($this->insert_or_update($request, $variation)){
-            return $this->sendResponse(new VariationResource($variation), $this->prepareMessage(__FUNCTION__, $this->resource));
+        if($this->insert_or_update($request, $size)){
+            return $this->sendResponse(new SizeResource($size), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -113,9 +113,9 @@ class VariationController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Variation $variation)
+    public function destroy(Size $size)
     {
-        $variation->delete();
+        $size->delete();
 
         return $this->sendResponse([], $this->prepareMessage(__FUNCTION__, $this->resource));
     }
