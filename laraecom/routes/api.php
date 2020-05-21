@@ -18,17 +18,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
-Route::get('variations', 'VariationController@index');
-Route::get('variations/{variation}', 'VariationController@show');
+Route::get('sizes', 'SizeController@index');
+Route::get('sizes/{size}', 'SizeController@show');
 Route::get('categories', 'CategoryController@index');
 Route::get('categories/{category}', 'CategoryController@show');
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::get('logout', 'AuthController@logout');
 
-    Route::post('variations', 'VariationController@store');
-    Route::put('variations/{variation}', 'VariationController@update');
-    Route::delete('variations/{variation}', 'VariationController@destroy');
+    Route::post('sizes', 'SizeController@store');
+    Route::put('sizes/{size}', 'SizeController@update');
+    Route::delete('sizes/{size}', 'SizeController@destroy');
 
     Route::get('users', 'UserController@index');
     Route::get('users/{user}', 'UserController@show');
@@ -38,5 +38,9 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::post('categories', 'CategoryController@store');
     Route::put('categories/{category}', 'CategoryController@update');
     Route::delete('categories/{category}', 'CategoryController@destroy');
+
+    Route::post('products', 'ProductController@store');
+    Route::put('products/{product}', 'ProductController@update');
+    Route::delete('products/{product}', 'ProductController@destroy');
 });
 
