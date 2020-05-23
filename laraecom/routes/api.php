@@ -20,6 +20,8 @@ Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
 Route::get('sizes', 'SizeController@index');
 Route::get('sizes/{size}', 'SizeController@show');
+Route::get('colors', 'ColorController@index');
+Route::get('colors/{color}', 'ColorController@show');
 Route::get('categories', 'CategoryController@index');
 Route::get('categories/{category}', 'CategoryController@show');
 
@@ -29,6 +31,10 @@ Route::group(['middleware' => 'auth:api'], function() {
     Route::post('sizes', 'SizeController@store');
     Route::put('sizes/{size}', 'SizeController@update');
     Route::delete('sizes/{size}', 'SizeController@destroy');
+
+    Route::post('colors', 'ColorController@store');
+    Route::put('colors/{color}', 'ColorController@update');
+    Route::delete('colors/{color}', 'ColorController@destroy');
 
     Route::get('users', 'UserController@index');
     Route::get('users/{user}', 'UserController@show');
