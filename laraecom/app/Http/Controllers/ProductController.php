@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
+use App\Product;
+use App\ProductVariation;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController as BaseController;
-use App\Http\Resources\Category as CategoryResource;
+use App\Http\Resources\Product as ProductResource;
 use Validator;
 
-class CategoryController extends BaseController
+class ProductController extends BaseController
 {
-    public $resource = "Category";
+    public $resource = "Product";
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $cat = new Category();
-        $categories = $cat->getCategoriesWithNestedChild();
+        $prod = new Product();
+        $products = $prod->getProducts($request->all());
 
-        return $this->sendResponse(CategoryResource::collection($categories), $this->prepareMessage(__FUNCTION__, $this->resource));
+        return $this->sendResponse(ProductResource::collection($products), $this->prepareMessage(__FUNCTION__, $this->resource."s"));
     }
 
     /**
@@ -45,15 +46,21 @@ class CategoryController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required|unique:categories'
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|unique:products',
+            'description' => 'required|unique:products',
+            'base_price' => 'required|numeric',
+            'product_variations.*.size_id' => 'exists:sizes,id',
+            'product_variations.*.color_id' => 'exists:colors,id',
+            'product_variations.*.in_stock' => 'required|numeric',
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        $categories = new Category();
-        if($this->insert_or_update($request, $categories)){
-            return $this->sendResponse(new CategoryResource($categories), $this->prepareMessage(__FUNCTION__, $this->resource));
+        $products = new Product();
+        if($this->insert_or_update($request, $products)){
+            return $this->sendResponse(new ProductResource($products), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -65,12 +72,12 @@ class CategoryController extends BaseController
      */
     public function show($id)
     {
-        $category = Category::find($id);
-        if (is_null($category)) {
+        $product = Product::find($id);
+        if (is_null($product)) {
             return $this->sendError($this->prepareMessage('not_found', $this->resource));
         }
 
-        return $this->sendResponse(new CategoryResource($category), $this->prepareMessage(__FUNCTION__, $this->resource));
+        return $this->sendResponse(new ProductResource($product), $this->prepareMessage(__FUNCTION__, $this->resource));
     }
 
     /**
@@ -91,19 +98,20 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Product $product)
     {
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'name' => 'required|unique:categories,name,' . $category->id
+            'category_id' => 'required|exists:categories',
+            'name' => 'required|unique:products,name,' . $product->id
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if($this->insert_or_update($request, $category)){
-            return $this->sendResponse(new CategoryResource($category), $this->prepareMessage(__FUNCTION__, $this->resource));
+        if($this->insert_or_update($request, $product)){
+            return $this->sendResponse(new ProductResource($product), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -113,17 +121,26 @@ class CategoryController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy(Product $product)
     {
-        $category->delete();
+        $product->delete();
 
         return $this->sendResponse([], $this->prepareMessage(__FUNCTION__, $this->resource));
     }
 
     public function insert_or_update($request, $obj){
-        $obj->parent_id = $request->parent_id;
+        $obj->category_id = $request->category_id;
         $obj->name = $request->name;
+        $obj->description = $request->description;
+        $obj->base_price = $request->base_price;
         if($obj->save()){
+            if($request->product_variations){
+                $variations = array();
+                foreach($request->product_variations as $pv){
+                    $variations[] = new ProductVariation(['size_id' => $pv['size_id'], 'color_id' => $pv['color_id'], 'in_stock' => $pv['in_stock']]);
+                }
+                $obj->product_variations()->saveMany($variations);
+            }
             return true;
         }
         return false;
