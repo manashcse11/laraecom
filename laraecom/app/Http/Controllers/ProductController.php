@@ -48,10 +48,7 @@ class ProductController extends BaseController
         $validator = Validator::make($input, [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|unique:products',
-            'description' => 'required|unique:products',
             'base_price' => 'required|numeric',
-            'product_variations.*.size_id' => 'exists:sizes,id',
-            'product_variations.*.color_id' => 'exists:colors,id',
             'product_variations.*.in_stock' => 'required|numeric',
         ]);
         if($validator->fails()){
