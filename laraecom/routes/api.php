@@ -18,12 +18,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 Route::post('register', 'AuthController@register');
 Route::post('login', 'AuthController@login');
+
 Route::get('sizes', 'SizeController@index');
 Route::get('sizes/{size}', 'SizeController@show');
+
 Route::get('colors', 'ColorController@index');
 Route::get('colors/{color}', 'ColorController@show');
+
 Route::get('categories', 'CategoryController@index');
 Route::get('categories/{category}', 'CategoryController@show');
+
+Route::get('products', 'ProductController@index');
+Route::get('products/{product}', 'ProductController@show');
 
 Route::group(['middleware' => 'auth:api'], function() {
     Route::get('logout', 'AuthController@logout');

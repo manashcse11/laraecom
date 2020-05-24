@@ -57,7 +57,7 @@ class ProductController extends BaseController
 
         $products = new Product();
         if($this->insert_or_update($request, $products)){
-            return $this->sendResponse(new ProductResource($products), $this->prepareMessage(__FUNCTION__, $this->resource));
+            return $this->sendResponse(new ProductResource($products->find($products->id)->with('category', 'product_variations')->first()), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -69,7 +69,7 @@ class ProductController extends BaseController
      */
     public function show($id)
     {
-        $product = Product::find($id);
+        $product = Product::find($id)->with('category', 'product_variations')->first();
         if (is_null($product)) {
             return $this->sendError($this->prepareMessage('not_found', $this->resource));
         }
