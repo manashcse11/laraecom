@@ -33,7 +33,7 @@ class Product extends Model
      */
     public function getProducts($filters){
         return $this->productFilter($filters)
-            ->with('category')
+            ->with('category', 'product_variations')
             ->orderby('name')
             ->get();
     }

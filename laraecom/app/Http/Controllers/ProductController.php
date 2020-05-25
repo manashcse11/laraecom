@@ -100,15 +100,17 @@ class ProductController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            'category_id' => 'required|exists:categories',
-            'name' => 'required|unique:products,name,' . $product->id
+            'category_id' => 'required|exists:categories,id',
+            'name' => 'required|unique:products,name,' . $product->id,
+            'base_price' => 'required|numeric',
+            'product_variations.*.in_stock' => 'required|numeric',
         ]);
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
         if($this->insert_or_update($request, $product)){
-            return $this->sendResponse(new ProductResource($product), $this->prepareMessage(__FUNCTION__, $this->resource));
+            return $this->sendResponse(new ProductResource($product->with('category', 'product_variations')->first()), $this->prepareMessage(__FUNCTION__, $this->resource));
         }
     }
 
@@ -132,11 +134,18 @@ class ProductController extends BaseController
         $obj->base_price = $request->base_price;
         if($obj->save()){
             if($request->product_variations){
-                $variations = array();
-                foreach($request->product_variations as $pv){
-                    $variations[] = new ProductVariation(['size_id' => $pv['size_id'], 'color_id' => $pv['color_id'], 'in_stock' => $pv['in_stock']]);
+                $product_id = $obj->id;
+                foreach($request->product_variations as $pv) {
+                    $product_variations = isset($pv['id']) ? ProductVariation::find($pv['id']) : null;
+                    if (is_null($product_variations)) {
+                        $product_variations = new ProductVariation();
+                    }
+                    $product_variations->product_id = $product_id;
+                    $product_variations->size_id = $pv['size_id'];
+                    $product_variations->color_id = $pv['color_id'];
+                    $product_variations->in_stock = $pv['in_stock'];
+                    $product_variations->save();
                 }
-                $obj->product_variations()->saveMany($variations);
             }
             return true;
         }
