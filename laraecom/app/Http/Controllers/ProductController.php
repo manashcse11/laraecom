@@ -123,6 +123,7 @@ class ProductController extends BaseController
     public function destroy(Product $product)
     {
         $product->delete();
+        $product->product_variations()->delete();
 
         return $this->sendResponse([], $this->prepareMessage(__FUNCTION__, $this->resource));
     }
